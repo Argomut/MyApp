@@ -90,11 +90,11 @@ class Gui(tk.Frame):
       self.content = tk.Frame(self.canvas, background=self.white_smoke)
 
       #**
-      self.canvas.create_window((0,0), window=self.content, anchor="nw")
+      # self.canvas.create_window((0,0), window=self.content, anchor="nw")
 
       # ***
       # Create a window to store the frame
-      # self.content_id = self.canvas.create_window((0, 0), window=self.content, anchor="nw")
+      self.content_id = self.canvas.create_window((0, 0), window=self.content, anchor="nw")
 
       #Main content
       for x in range (20):
@@ -121,7 +121,7 @@ class Gui(tk.Frame):
         # print(label.__dict__['id'])
 
       # ***
-      # self.canvas.bind("<Configure>", self.on_canvas_resize)
+      self.canvas.bind("<Configure>", self.on_canvas_resize)
 
       self.content.update_idletasks()
       self.canvas.config(scrollregion=self.canvas.bbox("all"))
@@ -134,10 +134,10 @@ class Gui(tk.Frame):
     def on_canvas_resize(self, event):
         # Update the size of content frame based on the canvas size
         width = event.width
-        height = event.height
+        # height = event.height
         
         # Resize the content window to match the canvas size
-        self.canvas.itemconfig(self.content_id, width=width, height=height)
+        self.canvas.itemconfig(self.content_id, width=width)
 
         # Update the scroll region of the canvas to match the content size
         # self.canvas.config(scrollregion=self.canvas.bbox("all"))
