@@ -2,7 +2,7 @@ class ToDo:
   def __init__(self, id, title, progress, deadline, description):
     self.__id = id
     self.__title = title
-    self.progress = progress
+    self.__progress = progress
     self.__deadline = deadline
     self.__description = description
     self.__pinned = False
