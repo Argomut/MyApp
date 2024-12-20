@@ -433,3 +433,27 @@
 #   def clear(self):
 #     self.textbox.delete(1.0, tk.END)
 # MyGui()
+
+import tkinter as tk
+from tkinter import PhotoImage
+
+def on_image_click(event):
+    print("Image clicked!")
+
+# Create the main window
+root = tk.Tk()
+root.geometry("300x300")
+
+# Load an image (make sure the image path is correct)
+# Here we are using a sample .png image, but you can use any image file.
+image = PhotoImage(file="your_image.png")
+
+# Create a label with the image
+image_label = tk.Label(root, image=image)
+image_label.pack(padx=20, pady=20)
+
+# Bind the left mouse button click event to the on_image_click function
+image_label.bind("<Button-1>", on_image_click)
+
+# Run the Tkinter main loop
+root.mainloop()
