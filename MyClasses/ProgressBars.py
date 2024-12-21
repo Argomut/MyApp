@@ -1,6 +1,11 @@
+########## Custom Circular Progress Bar) ##########
+
+
 import tkinter as tk
 
 class ProgressBars:
+  
+  #Constructor
   def __init__(self, parent, side, length, thickness, wallpaper_colour, track_colour, fill_colour, external_function, argument = ""):
     self.__parent = parent
     self.__side = side
@@ -50,6 +55,6 @@ class ProgressBars:
   def on_click_with_event(self, event):
     self.__external_function(event)
 
-  # use
+  # Use
   # progress_bar = ProgressBar(root, 200, 20, "white", "black", "green", function())
   # progress_bar.setprogress(10)

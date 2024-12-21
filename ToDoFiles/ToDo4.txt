@@ -1,6 +1,8 @@
 4
-tset
-10
-55-888-14
-False
-234324
+Documentation
+40
+2024-12-24
+True
+*Need to add screenshots
+*Do stepwise refinement
+*Write user manual

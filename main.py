@@ -6,6 +6,7 @@
 
 
 import tkinter as tk
+import os
 from MyClasses.Gui import Gui
 from MyClasses.ToDo import ToDo
 
@@ -13,6 +14,10 @@ root = tk.Tk()
 root.title("My App")
 root.geometry("624x936")  #480x720 576x864 624x936 672x1008 720x1280
 root.resizable(False, False)
+
+#Set up for ToDo Module             -Elden
 ToDo.initialiseToDoList()
+
+#Initialise Gui
 my_app_instance = Gui(root)
 root.mainloop()
