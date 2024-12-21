@@ -14,12 +14,10 @@ class ToDo:
     self.__description = description
     self.__pinned = "False"
     self.incNextId()
-    print (existing)
     if not existing:
       self.generateFile()
       self.__toDoList.append(self)
      
-      
       
   #Getters and Setters
   def getId(self):
@@ -34,6 +32,7 @@ class ToDo:
   
   def setTitle(self, title):
     self.__title = title
+    self.generateFile()
 
   
   def getProgress(self):
@@ -46,6 +45,7 @@ class ToDo:
       return False
     else: 
       self.__progress = min(100,max(0,progress))
+      self.generateFile()
       return True
 
   
@@ -54,6 +54,7 @@ class ToDo:
   
   def setDeadline(self, deadline):
     self.__deadline = deadline
+    self.generateFile()
 
   
   def getDescription(self):
@@ -61,6 +62,7 @@ class ToDo:
   
   def setDescription(self, description):
     self.__description = description
+    self.generateFile()
 
   
   def getPin(self):
@@ -68,14 +70,13 @@ class ToDo:
   
   def setPin(self, pin):
     self.__pinned = pin
+    self.generateFile()
   
 
   #Other Methods
-  def TogglePin(self):
-    if self.__pinned == "False":
-      self.__pinned = "True"
-    else:
-      self.__pinned = "False"
+  def togglePin(self):
+    if self.__pinned == "False": self.setPin("True")
+    else: self.setPin("False")
 
   #Used in file creation
   def toString(self):
@@ -117,6 +118,7 @@ class ToDo:
 
   def deleteFile(self):
     try:
+      self.__toDoList.remove(self)
       if os.path.exists(self.getFile(self.getId())):
         os.remove(self.getFile(self.getId()))
       else:
@@ -183,3 +185,17 @@ class ToDo:
   def getToDoList(cls):
     cls.sortToDoList()
     return cls.__toDoList
+
+  @classmethod
+  def searchToDoList(cls, search):
+    pinnedSearchList = []
+    unpinnedSearchList = []
+    for x in cls.getToDoList():
+      if search.upper().strip() in x.getTitle().upper().strip():
+        if (x.getPin() == "False"):
+          unpinnedSearchList.append(x)
+        else:
+          pinnedSearchList.append(x)
+    pinnedSearchList.extend(unpinnedSearchList)
+    return pinnedSearchList
+    # pinnedSearchList.extend(unpinnedSearchList)

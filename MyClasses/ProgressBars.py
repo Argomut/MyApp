@@ -1,7 +1,7 @@
 import tkinter as tk
 
 class ProgressBars:
-  def __init__(self, parent, side, length, thickness, wallpaper_colour, track_colour, fill_colour, external_function):
+  def __init__(self, parent, side, length, thickness, wallpaper_colour, track_colour, fill_colour, external_function, argument = ""):
     self.__parent = parent
     self.__side = side
     self.__length = length
@@ -10,6 +10,7 @@ class ProgressBars:
     self.__track_colour = track_colour
     self.__fill_colour = fill_colour
     self.__external_function = external_function
+    self.__argument = argument
     
     # Creating a square background                                              -Elden
     self.__canvas = tk.Canvas(self.__parent, width=self.__length, height=self.__length, bg=self.__wallpaper_colour, highlightbackground=self.__wallpaper_colour)
@@ -35,10 +36,16 @@ class ProgressBars:
 
     progress = int(progress)/100 * 360
     self.__canvas.itemconfig(self.__progress_fill, extent=progress)
+
+    #if progress_fill goes full 360, arc will disappear, thus change track colour for the appearance
+    if progress == 360:
+      self.__canvas.itemconfig(self.__progress_track, outline=self.__fill_colour)
+    else:
+      self.__canvas.itemconfig(self.__progress_track, outline=self.__track_colour)
   
   #Execute external functions                                                   -Elden
   def on_click(self, event):
-    self.__external_function()
+    self.__external_function(self.__argument)
 
   def on_click_with_event(self, event):
     self.__external_function(event)

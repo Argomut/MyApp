@@ -10,7 +10,6 @@ from tkinter import ttk
 #Gui Class
 class Gui(tk.Frame):
     def __init__(self, root):
-
       #pages
       self.current_page_index = 0
       self.pages = []
@@ -24,9 +23,10 @@ class Gui(tk.Frame):
       self.powder_blue = "#C2EEF7"
       self.white_smoke = "#F5F5F5"
       self.gainsboro = "#DDDDDD"
+      self.bleu_de_france = "#228BE6"
 
       #Fonts
-      self.monospace_h1 = (("Consolas", 32, "bold"))
+      self.monospace_h1 = ("Consolas", 32, "bold")
       self.h1 = ("Garamond ", 20)
       self.h2 = ("Arial", 18)
       self.normal_text = ("Times New Roman",16)
@@ -50,6 +50,9 @@ class Gui(tk.Frame):
       self.back_icon = tk.PhotoImage(file="icon//back.png")
       self.back_icon = self.back_icon.subsample(12)
 
+      self.add_icon = tk.PhotoImage(file="icon//add.png")
+      self.add_icon = self.add_icon.subsample(7)
+
       #Initialising parent class                                                     --Elden         
       super().__init__(root, background='#EEEEEE')
       self.main = self
@@ -61,7 +64,7 @@ class Gui(tk.Frame):
 
     def create_main_page(self):
       self.create_header()
-      self.create_to_do_list()
+      self.create_to_do_frame()
       self.create_navbar()
   
 
@@ -72,8 +75,8 @@ class Gui(tk.Frame):
       self.header = tk.Frame(self.main, background=self.pacific_blue)
       self.header.pack(fill="x")
 
-      self.label = tk.Label(self.header, text="Title", background=self.pacific_blue, font=self.h1, fg="white", )
-      self.label.pack(side="left", padx=10, pady=10)
+      self.header_title = tk.Label(self.header, text="Title", background=self.pacific_blue, font=self.h1, fg="white", )
+      self.header_title.pack(side="left", padx=10, pady=10)
 
 
     #Creating a navigation bar at the bottom to navigate the 3 modules               --Elden 
@@ -95,73 +98,95 @@ class Gui(tk.Frame):
 
   
     #Creating the main interface of To-Do List module                                --Elden
-    def create_to_do_list(self):
+    def create_to_do_frame(self):
+
+      self.header_title.config(text="To-Do List Manager")
 
       #Frame to position canvas and scrollbar
       self.container = tk.Frame(self.main)
       self.container.pack(side="top", fill="both", expand=True)
 
       #Using canvas to allow scrolling
-      self.canvas = tk.Canvas(self.container,background="red")
+      self.canvas = tk.Canvas(self.container,background=self.white_smoke)
       self.canvas.pack(side="left", fill="both", expand=True)
 
       #Create a scrollbar for the canvas
       self.scrollbar = tk.Scrollbar(self.container, orient="vertical", command=self.canvas.yview)
       self.scrollbar.pack(side="right", fill="y")
-
-      #Configure canvas to respond to the scrollbar
       self.canvas.configure(yscrollcommand=self.scrollbar.set)
+      
 
-      #Frame to store main content
+      #Create frame to store main content and adjusting frame to fill canvas
       self.content = tk.Frame(self.canvas, background=self.white_smoke)
-
-      # Create a window to store the frame
       self.content_id = self.canvas.create_window((0, 0), window=self.content, anchor="nw")
 
+      self.create_to_do_content()
+
+      self.canvas.bind_all("<MouseWheel>", lambda event, canvas=self.canvas: on_windows_mouse_wheel(event, canvas))
+      self.canvas.bind_all("<Button-4>", lambda event, canvas=self.canvas: on_linux_mouse_wheel(event, canvas))
+      self.canvas.bind_all("<Button-5>", lambda event, canvas=self.canvas: on_linux_mouse_wheel(event, canvas))
+    
+    def create_search(self):
+      self.clear(self.content)
+      #search feature
       self.search_frame = tk.Frame(self.content, background=self.white_smoke)
       self.search_frame.pack(side="top", fill="x", expand=True, padx=10, pady=10)
 
       self.searchbar = tk.Entry(self.search_frame, font=self.normal_text)
       self.searchbar.pack(side="left", fill="x", expand="true")
+      self.searchbar.bind("<Return>", lambda event: self.search(self.refresh_frame))
 
-      self.search_btn = tk.Button(self.search_frame, text="Search", image=self.search_icon, compound="left", command=lambda: self.clear(self.content))
+      self.search_btn = tk.Button(self.search_frame, text="Search", image=self.search_icon, compound="left", command=lambda: self.search(self.refresh_frame))
       self.search_btn.pack(side="left", padx=20)
 
       #Main content
       self.refresh_frame = tk.Frame(self.content, background=self.white_smoke)
       self.refresh_frame.pack(fill="x", expand="true")
 
-      toDoList = []
-      for x in range(10):
-        toDo = ToDo("Title {}".format(x), x*10, x, "Description {}".format(x))
-        print(toDo.toString())
-        toDoList.append(toDo)
-
+    def create_to_do_list(self):
+      self.header_title.config(text="To-Do List Manager")
+      #List of individual ToDo Tasks
+      for x in ToDo.searchToDoList(self.searchbar.get()):
         self.note_frame = tk.Frame(self.refresh_frame, background=self.powder_blue)
         self.note_frame.pack(fill="x", expand="true", padx=10, pady=10)
-        self.note_frame.bind("<Button-1>", self.test4)
+        self.note_frame.bind("<Button-1>", lambda event, obj=x: self.edit_note(obj))
 
-        self.progress = ProgressBars(self.note_frame, "left", 75, 10, self.powder_blue, "black", "green", self.test4)
-        self.progress.setProgress(toDo.getProgress())
+        self.progress = ProgressBars(self.note_frame, "left", 75, 10, self.powder_blue, "black", "green", self.edit_note, x)
+        self.progress.setProgress(x.getProgress())
 
         self.mid_frame = tk.Frame(self.note_frame, background=self.powder_blue)
         self.mid_frame.pack(side="left", fill="both", expand="true")
+        self.mid_frame.bind("<Button-1>", lambda event, obj=x: self.edit_note(obj))
 
-        self.title = tk.Label(self.mid_frame, text=toDo.getTitle(), background="lightblue", font=self.h1, anchor="w")
+        self.title = tk.Label(self.mid_frame, text=x.getTitle(), background=self.powder_blue, font=self.monospace_h1, anchor="w", wraplength=360, justify="left")
         self.title.pack(fill="x", padx=10, pady="10")
+        self.title.bind("<Button-1>", lambda event, obj=x: self.edit_note(obj))
 
-        self.deadline = tk.Label(self.mid_frame, text=toDo.getDeadline(), background=self.light_green, font=self.normal_text)
+        self.deadline = tk.Label(self.mid_frame, text="Deadline: " + x.getDeadline(), background=self.powder_blue, font=self.normal_text, anchor="w")
         self.deadline.pack(fill="x", padx=10, pady="10")
+        self.deadline.bind("<Button-1>", lambda event, obj=x: self.edit_note(obj))
 
         self.trash = tk.Label(self.note_frame, image=self.trash_icon, background=self.powder_blue)
         self.trash.pack(side="right")
-        if (x == 9):
-          toDo.TogglePin()
-        if (toDo.getPin()):
+        self.trash.bind("<Button-1>", lambda event, obj=x, widget=self.note_frame: self.delete(obj, widget))
+        #need to refresh list
+
+        if (x.getPin()=="True"):
           self.pin = tk.Label(self.note_frame, image=self.pin2_icon, background=self.powder_blue)
         else:
           self.pin = tk.Label(self.note_frame, image=self.pin1_icon, background=self.powder_blue)
         self.pin.pack(side="right")
+        self.pin.bind("<Button-1>", lambda event, obj=x, widget=self.pin: self.pinning(obj,widget))
+
+      self.lower_padding = tk.Label(self.refresh_frame, background=self.white_smoke)
+      self.lower_padding.pack(pady=40)
+
+      self.add_note_btn = tk.Button(self.container, image= self.add_icon, background=self.pacific_blue, highlightthickness=0, border=0, command=self.create_note)
+      self.add_note_btn.place(x=520, y=740)
+      self.add_note_btn.lift()
+      self.adjust_canvas()
+
+      
 
 
       #add some invisible widget to add padding for new note button
@@ -173,36 +198,48 @@ class Gui(tk.Frame):
         # label.pack(padx=50, pady=50)
         # print(label.__dict__['id'])
 
-      #Adjusting the size of the self.content frame to fill the canvas
-      self.canvas.bind("<Configure>", self.on_canvas_resize)
-
-      self.content.update_idletasks()
-
-      # Update the scroll region of the canvas to match the content size
-      self.canvas.config(scrollregion=self.canvas.bbox("all"))
-
-      #Bind mouse scroll to canvas
-      self.canvas.bind_all("<MouseWheel>", lambda event, canvas=self.canvas: on_windows_mouse_wheel(event, canvas))
-      self.canvas.bind_all("<Button-4>", lambda event, canvas=self.canvas: on_linux_mouse_wheel(event, canvas))
-      self.canvas.bind_all("<Button-5>", lambda event, canvas=self.canvas: on_linux_mouse_wheel(event, canvas))
-
-
-    def on_progressbar_click(self, event):
-      print("Progress bar clicked!")
-
-    def test4(self):
-      print("test")
-      
     def clear(self, parent):
+      try:
+        self.add_note_btn.destroy()
+      except:
+        pass
       for widget in parent.winfo_children():
         widget.destroy()
-      self.create_note()
 
+    def search(self, parent):
+      self.clear(parent)
+      self.create_to_do_list()
+
+    def pinning(self, obj, widget):
+      pin1 = self.pin1_icon
+      pin2 = self.pin2_icon
+      if obj.getPin() == "False":
+        widget.config(image=pin2)
+      else:
+        widget.config(image=pin1)
+      obj.togglePin()
+
+    def delete(self, obj, widget):
+      obj.deleteFile()
+      for child in widget.winfo_children():
+        child.destroy()
+      widget.destroy()
+      self.adjust_canvas()
+    
+    def create_to_do_content(self):
+      self.create_search()
+      self.create_to_do_list()
+    
     def create_note(self):
+      obj = ToDo()
+      self.edit_note(obj)
+
+    def edit_note(self, obj):
+      self.clear(self.content)
       self.note_background_frame = tk.Frame(self.content, background=self.powder_blue)
       self.note_background_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-      self.back_btn = tk.Button(self.note_background_frame, background=self.powder_blue, image=self.back_icon ,command=self.clear, highlightthickness=0, border=0)
+      self.back_btn = tk.Button(self.note_background_frame, background=self.powder_blue, image=self.back_icon ,command=self.create_to_do_content, highlightthickness=0, border=0)
       self.back_btn.pack(side="top", padx=10, pady=10, anchor="w")
 
       self.note_header = tk.Frame(self.note_background_frame, background=self.powder_blue)
@@ -211,11 +248,11 @@ class Gui(tk.Frame):
       self.note_progress_frame = tk.Frame(self.note_header, background=self.powder_blue)
       self.note_progress_frame.pack(side="left")
 
-      self.note_progress = ProgressBars(self.note_progress_frame, "top", 150, 20, self.powder_blue, "black", "green", self.set_progress_popup)
-      self.note_progress.setProgress(10)
+      self.note_progress = ProgressBars(self.note_progress_frame, "top", 150, 20, self.powder_blue, "black", "green", self.set_progress_popup, obj)
+      self.note_progress.setProgress(obj.getProgress())
 
       # Need to decide to use button or not
-      self.note_progress_btn = tk.Button(self.note_progress_frame, text="Update Progress", background="#90EE90", anchor="center", command=self.set_progress_popup, font=self.normal_text)
+      self.note_progress_btn = tk.Button(self.note_progress_frame, text="Update Progress", background="#90EE90", anchor="center", command= lambda: self.set_progress_popup(obj), font=self.normal_text)
       self.note_progress_btn.pack(pady=10, side="top")
 
       self.note_mid_frame = tk.Frame(self.note_header, background=self.powder_blue)
@@ -223,56 +260,32 @@ class Gui(tk.Frame):
 
       self.note_title = tk.Text(self.note_mid_frame, height=1, background=self.powder_blue, font=self.monospace_h1)
       self.note_title.pack(fill="x", padx=10, pady="10")
-      
       self.note_title.bind("<KeyPress>", lambda event: self.adjust_lines(event, self.note_title))
       self.note_title.bind("<Return>", lambda event: self.unfocus_field(event))
-      self.note_title.insert("1.0", "Test")
+      self.note_title.bind("<FocusOut>", lambda event: self.submit_title(obj))
+      self.note_title.insert("1.0", obj.getTitle())
       self.set_lines(self.note_title)
 
-      self.note_deadline = tk.Button(self.note_mid_frame, text="Deadline: {}".format("toDo.getDeadline()"), background=self.light_green, font=self.h2, command=self.datepicker_popup)
+      self.note_deadline = tk.Button(self.note_mid_frame, text="Deadline: {}".format(obj.getDeadline()), background=self.light_green, font=self.h2, command= lambda: self.datepicker_popup(obj))
       self.note_deadline.pack(padx=10, pady="10", side="bottom")
+
+      self.note_padding = tk.Label(self.note_background_frame, background=self.powder_blue)
+      self.note_padding.pack(padx=10, pady=10, side="bottom")
 
       self.note_description_label = tk.Label(self.note_background_frame, background=self.powder_blue, font=self.h2, text="Description: ", anchor="w")
       self.note_description_label.pack(padx=10, fill="x", expand=True)
 
-      self.note_description = tk.Text(self.note_background_frame, background=self.powder_blue, height=50, font=self.normal_text)
+      self.note_description = tk.Text(self.note_background_frame, background=self.powder_blue, height=32, font=self.normal_text)
       self.note_description.pack(pady=10, padx=10, side="bottom", expand=True, fill="both")
-      self.note_description.bind("<Return>", self.unfocus_field_v2)
-    
-    def test2(self):
-      self.test_frame = tk.Frame(self.refresh_frame, background="red")
-      self.test_frame.pack(fill="both", expand="true")
-      # toDoList = []
-      # for x in range(10):
-      #   toDo = ToDo(x, "Title 1{}".format(x), x*5, x, "Description 1{}".format(x))
-      #   toDoList.append(toDo)
+      self.note_description.insert("1.0", obj.getDescription())
+      self.note_description.bind("<Return>", lambda event: self.unfocus_field_v2(event))
+      self.note_description.bind("<FocusOut>", lambda event: self.submit_description(obj))
+      
+      self.adjust_canvas()
 
-      #   self.note_frame = tk.Frame(self.refresh_frame, background=self.powder_blue)
-      #   self.note_frame.pack(fill="x", expand="true", padx=10, pady=10)
+      
 
-      #   self.progress = ProgressBars(self.note_frame, "left", 75, 10, self.powder_blue, "black", "green")
-      #   self.progress.setProgress(toDo.getProgress())
-
-      #   self.mid_frame = tk.Frame(self.note_frame, background=self.powder_blue)
-      #   self.mid_frame.pack(side="left", fill="both", expand="true")
-
-      #   self.title = tk.Label(self.mid_frame, text=toDo.getTitle(), background="lightblue", font=self.h2, anchor="w")
-      #   self.title.pack(fill="x", padx=10, pady="10")
-
-      #   self.deadline = tk.Label(self.mid_frame, text=toDo.getDeadline(), background=self.light_green, font=self.normal_text)
-      #   self.deadline.pack(fill="x", padx=10, pady="10")
-
-      #   self.trash = tk.Label(self.note_frame, image=self.trash_icon, background=self.powder_blue)
-      #   self.trash.pack(side="right")
-      #   if (x == 2 or x == 5):
-      #     toDo.setPin()
-      #   if (toDo.getPin()):
-      #     self.pin = tk.Label(self.note_frame, image=self.pin2_icon, background=self.powder_blue)
-      #   else:
-      #     self.pin = tk.Label(self.note_frame, image=self.pin1_icon, background=self.powder_blue)
-      #   self.pin.pack(side="right")
-
-    def set_progress_popup(self):
+    def set_progress_popup(self,obj):
       popup = tk.Toplevel()
       popup.title("Set Progress")
       
@@ -281,13 +294,20 @@ class Gui(tk.Frame):
 
       progress_entry = tk.Entry(popup, font=self.h1)
       progress_entry.pack(padx=10)
+
+      label = tk.Label(popup, text="Enter a number (1-100): ", foreground="red")
+      label.pack_forget()
       
-      progress_submit = tk.Button(popup, text="Update Progress", font=self.h1, command=lambda:self.set_progress(progress_entry, popup))
+      progress_submit = tk.Button(popup, text="Update Progress", font=self.h1, command=lambda:self.set_progress(progress_entry, popup, obj, label))
       progress_submit.pack(padx=10, pady=10)
     
-    def set_progress(self, progress_entry, popup):
-      self.note_progress.setProgress(int(progress_entry.get()))
-      popup.destroy()
+    def set_progress(self, progress_entry, popup, obj, label):
+      label.pack_forget()
+      if (obj.setProgress(progress_entry.get())):
+        self.note_progress.setProgress(obj.getProgress())
+        popup.destroy()
+      else:
+        label.pack(before=progress_entry)
 
     def adjust_lines(self, event, widget):
       self.set_lines(widget)
@@ -297,50 +317,60 @@ class Gui(tk.Frame):
       min = 1
       char_count = len(widget.get("1.0", "end-1c"))
       roof_division = -(char_count//-width)           #reversing floor division to do roof division
-      new_height = max(1, roof_division)              
+      new_height = max(min, roof_division)              
       widget.config(height = new_height) 
       
       #Used for testing
       #print(char_count)
 
+    def submit_title(self, obj):
+      obj.setTitle(self.note_title.get("1.0", "end-1c"))
+      # return self.unfocus_field(event)
+    
+    def submit_description(self, obj):
+      obj.setDescription(self.note_description.get("1.0", "end-1c"))
+      # return self.unfocus_field_v2(event)
+
+    #Exit field when return pressed
     def unfocus_field(self, event):
       self.master.focus_set()
       return "break"
     
+    #Exit field when return pressed, move to next line when alt key is pressed too
     def unfocus_field_v2(self, event):
-      # print(f"Event state: {event.state}, Key: {event.keysym}")
-      if event.state == 8:
+      if event.state == 8:              #return only
         return self.unfocus_field(event)
-      # elif event.state == 131080:
-      #   pass
+      elif event.state == 131080:       #return + alt key
+        pass
+      else:                             #return + shift/ctrl/... 
+        return "break"
+
+      # Used for testing
+      # print(f"Event state: {event.state}, Key: {event.keysym}")
       
-    def datepicker_popup(self):
+    #create a popup to select deadline
+    def datepicker_popup(self, obj):
       popup = tk.Toplevel(background=self.white_smoke)
       popup.title("Select deadline")
-      cal = Calendar(popup, selectmode='day', date_pattern='dd-mm-yyyy', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black", )
+      cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black", )
       cal.pack(pady=20, padx=20)
-
-      deadline_btn = tk.Button(popup, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup))
+      deadline_btn = tk.Button(popup, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup, obj))
       deadline_btn.pack(pady=10)
 
-    def set_date(self, calendar, popup):
+    #close pop and and pass the deadline selected
+    def set_date(self, calendar, popup, obj):
       deadline = calendar.get_date()
       popup.destroy()
       self.note_deadline.config(text="Deadline: {}".format(deadline))
+      obj.setDeadline(deadline)
 
       # Used for testing
       # print("Deadline : {}".format(deadline))
 
+    #Resize content window to match canvas size
     def on_canvas_resize(self, event):
-        # Update the size of content frame based on the canvas size
         width = event.width
-        
-        # Resize the content window to match the canvas size
         self.canvas.itemconfig(self.content_id, width=width)
-
-  
-    def on_button_click(self):
-      self.label.config(text="Button Clicked!")
 
     def load_main_widget(self):
       pass
@@ -368,6 +398,11 @@ class Gui(tk.Frame):
 
     def page4(self):
       pass
+
+    def adjust_canvas(self):
+      self.canvas.bind("<Configure>", self.on_canvas_resize)
+      self.content.update_idletasks()
+      self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
 
 
