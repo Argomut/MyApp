@@ -1,3 +1,6 @@
+########## Class for To-Do List Manager Module #########
+
+
 import os
 
 class ToDo:
@@ -6,6 +9,7 @@ class ToDo:
   __max_id = 0
   __toDoList = []
 
+  #Constructor
   def __init__(self, title="untitled", progress=0, deadline="none", description="", existing=False):
     self.__id =self.getNextId()
     self.__title = title
@@ -82,6 +86,7 @@ class ToDo:
   def toString(self):
     return ("{}\n{}\n{}\n{}\n{}\n{}".format(self.getId(), self.getTitle(), self.getProgress(), self.getDeadline(), self.getPin(), self.getDescription()))
   
+  #Used for testing
   def __repr__(self):
     return "ToDo({},{},{},{},{},{})".format(self.getId(), self.getTitle(), self.getProgress(), self.getDeadline(), self.getPin(), self.getDescription())
 
@@ -116,6 +121,7 @@ class ToDo:
       print("Error reading file")
 
 
+  #Deleting file and removing from list
   def deleteFile(self):
     try:
       self.__toDoList.remove(self)
@@ -126,6 +132,7 @@ class ToDo:
     except:
       print("Error removing file")
   
+  #class methods
   @classmethod
   def setNextId(cls, next_id):
     cls.__next_id = next_id
@@ -136,6 +143,7 @@ class ToDo:
       print("Error writing file")
     file.close()
 
+  #Next Id increment
   @classmethod
   def incNextId(cls):
     cls.__next_id = int(cls.__next_id) + 1
@@ -160,8 +168,10 @@ class ToDo:
     file.close()
     return cls.__next_id
 
+  #Recovery in case folder and files were deleted or modified
   @classmethod
   def fixConfig(cls):
+    if not os.path.exists("ToDoFiles"): os.makedirs("ToDoFiles", exist_ok=True)
     fixing_range = 1000
     for x in range(int(cls.getNextId()) + fixing_range, 0, -1):
       if os.path.exists("ToDoFiles//ToDo{}.txt".format(x)):
@@ -177,6 +187,7 @@ class ToDo:
         obj.readFile(x)
         cls.__toDoList.append(obj)
 
+  #Sorting so that earlier deadlines are displayed first
   @classmethod
   def sortToDoList(cls):
     cls.__toDoList.sort(key=lambda todo: (todo.__deadline, todo.__pinned))
@@ -186,6 +197,7 @@ class ToDo:
     cls.sortToDoList()
     return cls.__toDoList
 
+  #Search function to filter results
   @classmethod
   def searchToDoList(cls, search):
     pinnedSearchList = []
@@ -198,4 +210,3 @@ class ToDo:
           pinnedSearchList.append(x)
     pinnedSearchList.extend(unpinnedSearchList)
     return pinnedSearchList
-    # pinnedSearchList.extend(unpinnedSearchList)

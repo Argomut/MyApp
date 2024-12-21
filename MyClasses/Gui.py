@@ -3,17 +3,13 @@ from MyClasses.ToDo import ToDo
 from MyClasses.ProgressBars import ProgressBars
 from tkcalendar import Calendar
 import datetime
-from tkinter import font
-from tkinter import messagebox
-from tkinter import ttk
+
 
 #Gui Class
 class Gui(tk.Frame):
+    
+    #Constructor
     def __init__(self, root):
-      #pages
-      self.current_page_index = 0
-      self.pages = []
-
       #Holding values that are shared to allow quick adjustments                     --Elden
       #Colours
       self.muskeg_grey = "#46484A"
@@ -96,7 +92,10 @@ class Gui(tk.Frame):
       self.btn3 = tk.Button(self.navbar, text="Module 3", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1)
       self.btn3.grid(row=0, column=2, sticky="ew", padx=0, pady=0)
 
-  
+
+    ########## Start of To-Do List Manager Module ##########     
+                      
+
     #Creating the main interface of To-Do List module                                --Elden
     def create_to_do_frame(self):
 
@@ -122,13 +121,18 @@ class Gui(tk.Frame):
 
       self.create_to_do_content()
 
+      #binding mousescroll 
       self.canvas.bind_all("<MouseWheel>", lambda event, canvas=self.canvas: on_windows_mouse_wheel(event, canvas))
       self.canvas.bind_all("<Button-4>", lambda event, canvas=self.canvas: on_linux_mouse_wheel(event, canvas))
       self.canvas.bind_all("<Button-5>", lambda event, canvas=self.canvas: on_linux_mouse_wheel(event, canvas))
-    
+
+    def create_to_do_content(self):
+      self.create_search()
+      self.create_to_do_list()
+
+    #Search feature
     def create_search(self):
-      self.clear(self.content)
-      #search feature
+      self.clear(self.content)  
       self.search_frame = tk.Frame(self.content, background=self.white_smoke)
       self.search_frame.pack(side="top", fill="x", expand=True, padx=10, pady=10)
 
@@ -139,12 +143,13 @@ class Gui(tk.Frame):
       self.search_btn = tk.Button(self.search_frame, text="Search", image=self.search_icon, compound="left", command=lambda: self.search(self.refresh_frame))
       self.search_btn.pack(side="left", padx=20)
 
-      #Main content
       self.refresh_frame = tk.Frame(self.content, background=self.white_smoke)
       self.refresh_frame.pack(fill="x", expand="true")
 
+    #Show list of all the ToDo tasks
     def create_to_do_list(self):
       self.header_title.config(text="To-Do List Manager")
+
       #List of individual ToDo Tasks
       for x in ToDo.searchToDoList(self.searchbar.get()):
         self.note_frame = tk.Frame(self.refresh_frame, background=self.powder_blue)
@@ -169,7 +174,6 @@ class Gui(tk.Frame):
         self.trash = tk.Label(self.note_frame, image=self.trash_icon, background=self.powder_blue)
         self.trash.pack(side="right")
         self.trash.bind("<Button-1>", lambda event, obj=x, widget=self.note_frame: self.delete(obj, widget))
-        #need to refresh list
 
         if (x.getPin()=="True"):
           self.pin = tk.Label(self.note_frame, image=self.pin2_icon, background=self.powder_blue)
@@ -184,20 +188,9 @@ class Gui(tk.Frame):
       self.add_note_btn = tk.Button(self.container, image= self.add_icon, background=self.pacific_blue, highlightthickness=0, border=0, command=self.create_note)
       self.add_note_btn.place(x=520, y=740)
       self.add_note_btn.lift()
-      self.adjust_canvas()
+      self.adjust_canvas()    
 
-      
-
-
-      #add some invisible widget to add padding for new note button
-
-
-        # progress = ttk.Progressbar(frame, variable=10, maximum=100)
-        # label = tk.Label(self.content, text="test", font=("Arial", 18), background="white")
-        # label.__dict__['id'] = x 
-        # label.pack(padx=50, pady=50)
-        # print(label.__dict__['id'])
-
+    #Clear previous widgets to allow new contents in the page
     def clear(self, parent):
       try:
         self.add_note_btn.destroy()
@@ -206,10 +199,12 @@ class Gui(tk.Frame):
       for widget in parent.winfo_children():
         widget.destroy()
 
+    #Clearing page before displaying todo list
     def search(self, parent):
       self.clear(parent)
       self.create_to_do_list()
 
+    #Change the pin icon and save data when pin icon clicked
     def pinning(self, obj, widget):
       pin1 = self.pin1_icon
       pin2 = self.pin2_icon
@@ -219,6 +214,7 @@ class Gui(tk.Frame):
         widget.config(image=pin1)
       obj.togglePin()
 
+    #Delete file and remove the widget when trash icon clicked
     def delete(self, obj, widget):
       obj.deleteFile()
       for child in widget.winfo_children():
@@ -226,14 +222,12 @@ class Gui(tk.Frame):
       widget.destroy()
       self.adjust_canvas()
     
-    def create_to_do_content(self):
-      self.create_search()
-      self.create_to_do_list()
-    
+    #Create a new empty ToDo object and bring user to edit page
     def create_note(self):
       obj = ToDo()
       self.edit_note(obj)
 
+    #Edit page for user to edit the task's data
     def edit_note(self, obj):
       self.clear(self.content)
       self.note_background_frame = tk.Frame(self.content, background=self.powder_blue)
@@ -248,22 +242,28 @@ class Gui(tk.Frame):
       self.note_progress_frame = tk.Frame(self.note_header, background=self.powder_blue)
       self.note_progress_frame.pack(side="left")
 
+      #Progress bar can be clicked instead of just button
       self.note_progress = ProgressBars(self.note_progress_frame, "top", 150, 20, self.powder_blue, "black", "green", self.set_progress_popup, obj)
       self.note_progress.setProgress(obj.getProgress())
 
-      # Need to decide to use button or not
       self.note_progress_btn = tk.Button(self.note_progress_frame, text="Update Progress", background="#90EE90", anchor="center", command= lambda: self.set_progress_popup(obj), font=self.normal_text)
       self.note_progress_btn.pack(pady=10, side="top")
 
       self.note_mid_frame = tk.Frame(self.note_header, background=self.powder_blue)
       self.note_mid_frame.pack(side="left", fill="both", expand="true")
 
+      '''
+      Insert the saved title to the field
+      Automatically move to add and move to next line (not advance enough to move entire word yey)
+      Unfocus the field when return key is pressed
+      Save the contents when field is unfocus
+      '''
       self.note_title = tk.Text(self.note_mid_frame, height=1, background=self.powder_blue, font=self.monospace_h1)
       self.note_title.pack(fill="x", padx=10, pady="10")
+      self.note_title.insert("1.0", obj.getTitle())
       self.note_title.bind("<KeyPress>", lambda event: self.adjust_lines(event, self.note_title))
       self.note_title.bind("<Return>", lambda event: self.unfocus_field(event))
       self.note_title.bind("<FocusOut>", lambda event: self.submit_title(obj))
-      self.note_title.insert("1.0", obj.getTitle())
       self.set_lines(self.note_title)
 
       self.note_deadline = tk.Button(self.note_mid_frame, text="Deadline: {}".format(obj.getDeadline()), background=self.light_green, font=self.h2, command= lambda: self.datepicker_popup(obj))
@@ -283,8 +283,7 @@ class Gui(tk.Frame):
       
       self.adjust_canvas()
 
-      
-
+    #Create a popup for user to input their progress
     def set_progress_popup(self,obj):
       popup = tk.Toplevel()
       popup.title("Set Progress")
@@ -301,6 +300,15 @@ class Gui(tk.Frame):
       progress_submit = tk.Button(popup, text="Update Progress", font=self.h1, command=lambda:self.set_progress(progress_entry, popup, obj, label))
       progress_submit.pack(padx=10, pady=10)
     
+    #Save Title
+    def submit_title(self, obj):
+      obj.setTitle(self.note_title.get("1.0", "end-1c"))
+    
+    #Save description
+    def submit_description(self, obj):
+      obj.setDescription(self.note_description.get("1.0", "end-1c"))
+
+    #Validate input, save input, and close popup
     def set_progress(self, progress_entry, popup, obj, label):
       label.pack_forget()
       if (obj.setProgress(progress_entry.get())):
@@ -308,28 +316,42 @@ class Gui(tk.Frame):
         popup.destroy()
       else:
         label.pack(before=progress_entry)
+    
+    #Create a popup to select deadline
+    def datepicker_popup(self, obj):
+      popup = tk.Toplevel(background=self.white_smoke)
+      popup.title("Select deadline")
+      #Minimum date is current date
+      cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black", )
+      cal.pack(pady=20, padx=20)
+      deadline_btn = tk.Button(popup, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup, obj))
+      deadline_btn.pack(pady=10)
 
+    #save selected deadline and close popup
+    def set_date(self, calendar, popup, obj):
+      deadline = calendar.get_date()
+      popup.destroy()
+      self.note_deadline.config(text="Deadline: {}".format(deadline))
+      obj.setDeadline(deadline)
+
+      # Used for testing
+      # print("Deadline : {}".format(deadline))
+
+    #Adjusting line for Title
     def adjust_lines(self, event, widget):
       self.set_lines(widget)
+      self.adjust_canvas()
 
     def set_lines(self, widget):
       width = 15
       min = 1
       char_count = len(widget.get("1.0", "end-1c"))
-      roof_division = -(char_count//-width)           #reversing floor division to do roof division
+      roof_division = -(char_count//-width)           #Reversing floor division to do roof division
       new_height = max(min, roof_division)              
       widget.config(height = new_height) 
       
       #Used for testing
       #print(char_count)
-
-    def submit_title(self, obj):
-      obj.setTitle(self.note_title.get("1.0", "end-1c"))
-      # return self.unfocus_field(event)
-    
-    def submit_description(self, obj):
-      obj.setDescription(self.note_description.get("1.0", "end-1c"))
-      # return self.unfocus_field_v2(event)
 
     #Exit field when return pressed
     def unfocus_field(self, event):
@@ -348,63 +370,15 @@ class Gui(tk.Frame):
       # Used for testing
       # print(f"Event state: {event.state}, Key: {event.keysym}")
       
-    #create a popup to select deadline
-    def datepicker_popup(self, obj):
-      popup = tk.Toplevel(background=self.white_smoke)
-      popup.title("Select deadline")
-      cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black", )
-      cal.pack(pady=20, padx=20)
-      deadline_btn = tk.Button(popup, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup, obj))
-      deadline_btn.pack(pady=10)
-
-    #close pop and and pass the deadline selected
-    def set_date(self, calendar, popup, obj):
-      deadline = calendar.get_date()
-      popup.destroy()
-      self.note_deadline.config(text="Deadline: {}".format(deadline))
-      obj.setDeadline(deadline)
-
-      # Used for testing
-      # print("Deadline : {}".format(deadline))
-
     #Resize content window to match canvas size
-    def on_canvas_resize(self, event):
-        width = event.width
-        self.canvas.itemconfig(self.content_id, width=width)
-
-    def load_main_widget(self):
-      pass
-
-    def clear_frame(self, frame):
-      pass
-
-    def create_page_container(self):
-      pass
-
-    def create_pager(self):
-      pass
-
-      def change_page(button):
-        pass
-
-    def page1(self):
-      pass
-      
-    def page2(self):
-      pass
-
-    def page3(self):
-      pass
-
-    def page4(self):
-      pass
-
     def adjust_canvas(self):
       self.canvas.bind("<Configure>", self.on_canvas_resize)
       self.content.update_idletasks()
       self.canvas.config(scrollregion=self.canvas.bbox("all"))
-
-
+    
+    def on_canvas_resize(self, event):
+        width = event.width
+        self.canvas.itemconfig(self.content_id, width=width)
 
 #Detect mouse wheel scroll                                                           --Elden
 #Windows mouse wheel
@@ -420,4 +394,7 @@ def on_linux_mouse_wheel(event, canvas):
     canvas.yview_scroll(-1, "units")
   elif event.num == 5:
     canvas.yview_scroll(1, "units")
+
+
+########## End of To-Do List Manager Module ##########
 
