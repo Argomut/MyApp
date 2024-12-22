@@ -17,6 +17,7 @@ Navigation
 To-Do List Manager Module -- Elden:
     How to use:
         1. Create: Click on the square blue button on the bottom right corner. It will bring you to another page where you can edit the contents of your tasks
+        
             a. To edit progress bar, click on the progress bar itself or the "update progress" button. A popup will appear and you can enter the percentage of your current progress from 1-100
                It can accept a number below 0 or higher than 100, however, it will set it to 0 if the input is a negative number or set it to 100 if the input is higher than 100
                It can accept a decimal number, it will round out the number using Bankers's rounding (even number with .5 will go down while odd number with .5 will go up)
