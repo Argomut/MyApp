@@ -6,3 +6,4 @@ True
 *integrate GPA calculator
 *integrate Pomodoro timer
 *Put their icon in nav bar
+*Put all in one file????
