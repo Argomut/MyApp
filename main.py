@@ -1,12 +1,11 @@
-# import subprocess
-# import sys
+import subprocess
+import sys
 
-# #install tkcalendar whihc is needed for the ToDo Module
-# subprocess.check_call([sys.executable, "-m", "pip", "install", "tkcalendar"])
+#install tkcalendar whihc is needed for the ToDo Module
+subprocess.check_call([sys.executable, "-m", "pip", "install", "tkcalendar"])
 
 
 import tkinter as tk
-import os
 from MyClasses.Gui import Gui
 from MyClasses.ToDo import ToDo
 

@@ -59,9 +59,7 @@ class Gui(tk.Frame):
 
 
     def create_main_page(self):
-      self.create_header()
-      self.create_to_do_frame()
-      self.create_navbar()
+      self.load_to_do_list()
   
 
     #Creating the header at the top                                                  --Elden
@@ -83,20 +81,26 @@ class Gui(tk.Frame):
       self.navbar.columnconfigure(1, weight=1)
       self.navbar.columnconfigure(2, weight=1)
 
-      self.btn1 = tk.Button(self.navbar, text="To-Do List", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1)
+      self.btn1 = tk.Button(self.navbar, text="To-Do List", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_to_do_list)
       self.btn1.grid(row=0, column=0, sticky="ew", padx=0, pady=0)
 
-      self.btn2 = tk.Button(self.navbar, text="Module 2", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1)
+      self.btn2 = tk.Button(self.navbar, text="Module 2", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_pomodoro_timer)
       self.btn2.grid(row=0, column=1, sticky="ew", padx=0, pady=0)
 
-      self.btn3 = tk.Button(self.navbar, text="Module 3", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1)
+      self.btn3 = tk.Button(self.navbar, text="Module 3", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_gpa_calculator)
       self.btn3.grid(row=0, column=2, sticky="ew", padx=0, pady=0)
 
-
     ########## Start of To-Do List Manager Module ##########     
+    
+    #Clear page before loading To-Do List widgets                                    --Elden
+    def load_to_do_list(self):
+      self.clear(self.main)
+      self.create_header()
+      self.create_to_do_frame()
+      self.create_navbar()
                       
 
-    #Creating the main interface of To-Do List module                                --Elden
+    #Creating the main interface of To-Do List module                                
     def create_to_do_frame(self):
 
       self.header_title.config(text="To-Do List Manager")
@@ -230,10 +234,15 @@ class Gui(tk.Frame):
     #Edit page for user to edit the task's data
     def edit_note(self, obj):
       self.clear(self.content)
+
+      #Deleting navbar to prevent user going to other modules and not save the data
+      self.clear(self.navbar)
+      self.navbar.destroy()
+
       self.note_background_frame = tk.Frame(self.content, background=self.powder_blue)
       self.note_background_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-      self.back_btn = tk.Button(self.note_background_frame, background=self.powder_blue, image=self.back_icon ,command=self.create_to_do_content, highlightthickness=0, border=0)
+      self.back_btn = tk.Button(self.note_background_frame, background=self.powder_blue, image=self.back_icon ,command=lambda:self.up_button(obj), highlightthickness=0, border=0)
       self.back_btn.pack(side="top", padx=10, pady=10, anchor="w")
 
       self.note_header = tk.Frame(self.note_background_frame, background=self.powder_blue)
@@ -283,6 +292,15 @@ class Gui(tk.Frame):
       
       self.adjust_canvas()
 
+
+    #Return to main to-do list page
+    def up_button(self, obj):
+      obj.setTitle(self.note_title.get("1.0", "end-1c"))
+      obj.setDescription(self.note_description.get("1.0", "end-1c"))
+      self.create_to_do_content()
+      self.create_navbar()
+
+
     #Create a popup for user to input their progress
     def set_progress_popup(self,obj):
       popup = tk.Toplevel()
@@ -293,12 +311,15 @@ class Gui(tk.Frame):
 
       progress_entry = tk.Entry(popup, font=self.h1)
       progress_entry.pack(padx=10)
+      progress_entry.insert(0, obj.getProgress())
 
-      label = tk.Label(popup, text="Enter a number (1-100): ", foreground="red")
+      label = tk.Label(popup, text="Please enter an integer (1-100): ", foreground="red")
       label.pack_forget()
       
       progress_submit = tk.Button(popup, text="Update Progress", font=self.h1, command=lambda:self.set_progress(progress_entry, popup, obj, label))
       progress_submit.pack(padx=10, pady=10)
+
+      popup.geometry("320x190+{}+{}".format(self.main.winfo_rootx() + (self.main.winfo_width() - 320)//2, self.main.winfo_rooty() + (self.main.winfo_height() - 630)//2))
     
     #Save Title
     def submit_title(self, obj):
@@ -319,13 +340,19 @@ class Gui(tk.Frame):
     
     #Create a popup to select deadline
     def datepicker_popup(self, obj):
+      date = datetime.datetime.strptime(obj.getDeadline(), "%Y-%m-%d")
       popup = tk.Toplevel(background=self.white_smoke)
       popup.title("Select deadline")
       #Minimum date is current date
-      cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black", )
+      cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, 
+                     headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, 
+                     disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", 
+                     othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black", 
+                     year = int(date.strftime("%Y")), month = int(date.strftime("%m")), day = int(date.strftime("%d")))
       cal.pack(pady=20, padx=20)
       deadline_btn = tk.Button(popup, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup, obj))
       deadline_btn.pack(pady=10)
+      popup.geometry("420x355+{}+{}".format(self.main.winfo_rootx() + (self.main.winfo_width() - 420)//2, self.main.winfo_rooty() + (self.main.winfo_height() - 755)//2))
 
     #save selected deadline and close popup
     def set_date(self, calendar, popup, obj):
@@ -369,7 +396,7 @@ class Gui(tk.Frame):
 
       # Used for testing
       # print(f"Event state: {event.state}, Key: {event.keysym}")
-      
+    
     #Resize content window to match canvas size
     def adjust_canvas(self):
       self.canvas.bind("<Configure>", self.on_canvas_resize)
@@ -379,6 +406,23 @@ class Gui(tk.Frame):
     def on_canvas_resize(self, event):
         width = event.width
         self.canvas.itemconfig(self.content_id, width=width)
+
+
+
+########## End of To-Do List Manager Module ##########
+
+    def load_pomodoro_timer(self):
+          self.clear(self.main)
+          self.create_header()
+          #self.create_porodomo_timer
+          self.create_navbar()
+
+    def load_gpa_calculator(self):
+      self.clear(self.main)
+      self.create_header()
+      #self.create_gpa_calculator
+      self.create_navbar()
+
 
 #Detect mouse wheel scroll                                                           --Elden
 #Windows mouse wheel
@@ -394,7 +438,3 @@ def on_linux_mouse_wheel(event, canvas):
     canvas.yview_scroll(-1, "units")
   elif event.num == 5:
     canvas.yview_scroll(1, "units")
-
-
-########## End of To-Do List Manager Module ##########
-

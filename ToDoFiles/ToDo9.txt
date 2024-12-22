@@ -1,0 +1,8 @@
+9
+Make popup stay inside window
+90
+none
+False
+*date selector popup
+*progress adjust popup
+*Too complex to lock inside window
