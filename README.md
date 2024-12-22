@@ -5,11 +5,9 @@ After downloading and opening the prototype folder, ensure everything is saved
 To start the program: 
     Run main.py file
 
-Troubleshooting:
-    If the IDE glitched and a ModuleNotFoundError appear: 
-        1. go to main.py, line 9 and 10, delete the imports and manually retype the imports "from MyClasses.Gui import Gui" & "from MyClasses.ToDo import ToDo"
-        2. go to Gui.py, line 2, 3, and 4,  delete the imports and manually retype the imports "from MyClasses.Gui import Gui", "from MyClasses.ToDo import ToDo", "from MyClasses.ProgressBars import ProgressBars" & "from MyClasses.pmdr import PomodoroTimer"
-        3. in the terminal, run "pip install tkcalendar"
+If a ModuleNotFoundError appear: 
+        1. Check the import names in files involved
+        2. Manually install tkcalendar by running "pip install tkcalendar" in terminal
 
 Navigation
     There is a navigation bar with 3 buttons to navigate to each of the module. The default module in the To-Do List Manager Module, you can click on the other to navigate to pomodoro module/gpa module. You can also click on the button of the current module to refresh the page.
