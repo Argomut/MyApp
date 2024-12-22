@@ -44,7 +44,7 @@ class ToDo:
   
   def setProgress(self, progress):
     try:
-      progress = int(progress)
+      progress = round(float(progress))
     except:
       return False
     else: 
@@ -79,7 +79,7 @@ class ToDo:
 
   #Other Methods
   def togglePin(self):
-    if self.__pinned == "False": self.setPin("True")
+    if self.getPin() == "False": self.setPin("True")
     else: self.setPin("False")
 
   #Used in file creation
