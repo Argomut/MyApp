@@ -1,5 +1,8 @@
 7
-Write a readme  file
-0
+Make popup stay inside window
+90
 none
 False
+*Date slector popup
+*Progress adjust popup
+*Too complex to lock popup inside window

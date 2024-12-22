@@ -1,9 +1,10 @@
 2
 Test To-Do List Module
-80
+100
 2024-12-24
 True
 Create test case
 *Test search
 *Test set progress
 *Test set deadline
+*Write the test cases

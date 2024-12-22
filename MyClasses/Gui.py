@@ -1,6 +1,7 @@
 import tkinter as tk
 from MyClasses.ToDo import ToDo
 from MyClasses.ProgressBars import ProgressBars
+from MyClasses.pmdr import PomodoroTimer
 from tkcalendar import Calendar
 import datetime
 
@@ -49,6 +50,12 @@ class Gui(tk.Frame):
       self.add_icon = tk.PhotoImage(file="icon//add.png")
       self.add_icon = self.add_icon.subsample(7)
 
+      self.clock_icon = tk.PhotoImage(file="icon//clock.png")
+      self.clock_icon = self.clock_icon.subsample(8)
+
+      self.calculator_icon = tk.PhotoImage(file="icon//calculator.png")
+      self.calculator_icon = self.calculator_icon.subsample(8)
+
       #Initialising parent class                                                     --Elden         
       super().__init__(root, background='#EEEEEE')
       self.main = self
@@ -84,10 +91,10 @@ class Gui(tk.Frame):
       self.btn1 = tk.Button(self.navbar, text="To-Do List", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_to_do_list)
       self.btn1.grid(row=0, column=0, sticky="ew", padx=0, pady=0)
 
-      self.btn2 = tk.Button(self.navbar, text="Module 2", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_pomodoro_timer)
+      self.btn2 = tk.Button(self.navbar, text="Pomodoro Timer", image=self.clock_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_pomodoro_timer)
       self.btn2.grid(row=0, column=1, sticky="ew", padx=0, pady=0)
 
-      self.btn3 = tk.Button(self.navbar, text="Module 3", image=self.todo_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_gpa_calculator)
+      self.btn3 = tk.Button(self.navbar, text="GPA Calculator", image=self.calculator_icon, compound='top', background=self.pacific_blue, foreground="white", bd=1, command=self.load_gpa_calculator)
       self.btn3.grid(row=0, column=2, sticky="ew", padx=0, pady=0)
 
     ########## Start of To-Do List Manager Module ##########     
@@ -267,7 +274,7 @@ class Gui(tk.Frame):
       Unfocus the field when return key is pressed
       Save the contents when field is unfocus
       '''
-      self.note_title = tk.Text(self.note_mid_frame, height=1, background=self.powder_blue, font=self.monospace_h1)
+      self.note_title = tk.Text(self.note_mid_frame, height=1, background=self.powder_blue, font=self.monospace_h1, wrap="word")
       self.note_title.pack(fill="x", padx=10, pady="10")
       self.note_title.insert("1.0", obj.getTitle())
       self.note_title.bind("<KeyPress>", lambda event: self.adjust_lines(event, self.note_title))
@@ -284,7 +291,7 @@ class Gui(tk.Frame):
       self.note_description_label = tk.Label(self.note_background_frame, background=self.powder_blue, font=self.h2, text="Description: ", anchor="w")
       self.note_description_label.pack(padx=10, fill="x", expand=True)
 
-      self.note_description = tk.Text(self.note_background_frame, background=self.powder_blue, height=32, font=self.normal_text)
+      self.note_description = tk.Text(self.note_background_frame, background=self.powder_blue, height=32, font=self.normal_text, wrap="word")
       self.note_description.pack(pady=10, padx=10, side="bottom", expand=True, fill="both")
       self.note_description.insert("1.0", obj.getDescription())
       self.note_description.bind("<Return>", lambda event: self.unfocus_field_v2(event))
@@ -340,15 +347,21 @@ class Gui(tk.Frame):
     
     #Create a popup to select deadline
     def datepicker_popup(self, obj):
-      date = datetime.datetime.strptime(obj.getDeadline(), "%Y-%m-%d")
       popup = tk.Toplevel(background=self.white_smoke)
       popup.title("Select deadline")
-      #Minimum date is current date
-      cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, 
+      try:
+        date = datetime.datetime.strptime(obj.getDeadline(), "%Y-%m-%d")
+        cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, 
                      headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, 
                      disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", 
                      othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black", 
                      year = int(date.strftime("%Y")), month = int(date.strftime("%m")), day = int(date.strftime("%d")))
+      except:
+        #If deadline is none
+        cal = Calendar(popup, selectmode='day', date_pattern='yyyy-mm-dd', mindate=datetime.date.today(), showweeknumbers=False, firstweekday='sunday', font=self.h2, 
+                      headersbackground = self.powder_blue, selectbackground=self.powder_blue, selectforeground="black" , background = self.pacific_blue, 
+                      disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", 
+                      othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black")
       cal.pack(pady=20, padx=20)
       deadline_btn = tk.Button(popup, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup, obj))
       deadline_btn.pack(pady=10)
@@ -414,12 +427,14 @@ class Gui(tk.Frame):
     def load_pomodoro_timer(self):
           self.clear(self.main)
           self.create_header()
-          #self.create_porodomo_timer
+          self.header_title.config(text="Pomodoro Timer")
+          PomodoroTimer(self.main)
           self.create_navbar()
 
     def load_gpa_calculator(self):
       self.clear(self.main)
       self.create_header()
+      self.header_title.config(text="GPA Calculator")
       #self.create_gpa_calculator
       self.create_navbar()
 
@@ -427,14 +442,18 @@ class Gui(tk.Frame):
 #Detect mouse wheel scroll                                                           --Elden
 #Windows mouse wheel
 def on_windows_mouse_wheel(event, canvas):
-  if event.delta > 0:
+  if not canvas.winfo_exists(): 
+    return
+  elif event.delta > 0:
     canvas.yview_scroll(-1, "units")  # Scroll up
   else:
     canvas.yview_scroll(1, "units")   # Scroll down
 
 #Linux mouse wheel
 def on_linux_mouse_wheel(event, canvas):
-  if event.num == 4:
+  if not canvas.winfo_exists(): 
+    return
+  elif event.num == 4:
     canvas.yview_scroll(-1, "units")
   elif event.num == 5:
     canvas.yview_scroll(1, "units")
