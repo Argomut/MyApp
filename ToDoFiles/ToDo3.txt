@@ -1,6 +1,6 @@
 3
 Write functions for navigation  bar
-20
+100
 2024-12-22
 True
 *Need to clear the page

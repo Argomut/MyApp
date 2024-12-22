@@ -172,7 +172,7 @@ class ToDo:
   @classmethod
   def fixConfig(cls):
     if not os.path.exists("ToDoFiles"): os.makedirs("ToDoFiles", exist_ok=True)
-    fixing_range = 1000
+    fixing_range = 10000
     for x in range(int(cls.getNextId()) + fixing_range, 0, -1):
       if os.path.exists("ToDoFiles//ToDo{}.txt".format(x)):
         cls.__max_id = str(x)
@@ -180,6 +180,7 @@ class ToDo:
 
   @classmethod
   def initialiseToDoList(cls):
+    # del cls.__toDoList[-1]
     cls.fixConfig()
     for x in range(int(cls.__max_id)+1):
       if os.path.exists("ToDoFiles//ToDo{}.txt".format(x)):
