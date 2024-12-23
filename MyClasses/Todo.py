@@ -10,7 +10,7 @@ class ToDo:
   __toDoList = []
 
   #Constructor
-  def __init__(self, title="untitled", progress=0, deadline="none", description="", existing=False):
+  def __init__(self, title="Untitled", progress=0, deadline="None", description="", existing=False):
     self.__id =self.getNextId()
     self.__title = title
     self.__progress = progress

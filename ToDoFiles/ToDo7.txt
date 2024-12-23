@@ -1,7 +1,7 @@
 7
 Make popup stay inside window
 90
-none
+None
 False
 *Date slector popup
 *Progress adjust popup
