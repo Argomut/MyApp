@@ -198,6 +198,7 @@ class Gui(tk.Frame):
 
       self.add_note_btn = tk.Button(self.container, image= self.add_icon, background=self.pacific_blue, highlightthickness=0, border=0, command=self.create_note)
       self.add_note_btn.place(x=520, y=740)
+      # self.add_note_btn.place(x=520, y=450) #You can adjust the y according to your screen
       self.add_note_btn.lift()
       self.adjust_canvas()    
 
@@ -363,13 +364,18 @@ class Gui(tk.Frame):
                       disableddaybackground=self.earlgrey, disableddayforeground=self.muskeg_grey, weekendbackground="white", weekendforeground="black", 
                       othermonthbackground=self.gainsboro, othermonthforeground="black", othermonthwebackground=self.gainsboro, othermonthweforeground="black")
       cal.pack(pady=20, padx=20)
-      deadline_btn = tk.Button(popup, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup, obj))
-      deadline_btn.pack(pady=10)
+      deadline_frame = tk.Frame(popup, background=self.white_smoke)
+      deadline_frame.pack(pady=10, side="bottom")
+      none_deadline_btn = tk.Button(deadline_frame, text="No Deadline", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date("None", popup, obj))
+      none_deadline_btn.pack(padx=10, side="left")
+      deadline_btn = tk.Button(deadline_frame, text="Select", font=self.h2, background=self.pacific_blue, foreground="white", command=lambda:self.set_date(cal, popup, obj))
+      deadline_btn.pack(padx=10, side="left")
       popup.geometry("420x355+{}+{}".format(self.main.winfo_rootx() + (self.main.winfo_width() - 420)//2, self.main.winfo_rooty() + (self.main.winfo_height() - 755)//2))
 
     #save selected deadline and close popup
     def set_date(self, calendar, popup, obj):
-      deadline = calendar.get_date()
+      if calendar == "None": deadline = "None"
+      else: deadline = calendar.get_date()
       popup.destroy()
       self.note_deadline.config(text="Deadline: {}".format(deadline))
       obj.setDeadline(deadline)
