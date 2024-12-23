@@ -11,8 +11,6 @@ class ToDo:
 
   #Constructor
   def __init__(self, title="Untitled", progress=0, deadline="None", description="", existing=False):
-
-
     self.__id =self.getNextId()
     self.__title = title
     self.__progress = progress
