@@ -1,12 +1,15 @@
+########## Class for GUI (Elden) #########
+
 import tkinter as tk
 from MyClasses.ToDo import ToDo
 from MyClasses.ProgressBars import ProgressBars
 from MyClasses.pmdr import PomodoroTimer
+from MyClasses.gpa import cgpa
 from tkcalendar import Calendar
 import datetime
 
 
-#Gui Class
+#Gui Class inherit from tk.Frame
 class Gui(tk.Frame):
     
     #Constructor
@@ -308,6 +311,13 @@ class Gui(tk.Frame):
       self.create_to_do_content()
       self.create_navbar()
 
+    #Save Title
+    def submit_title(self, obj):
+      obj.setTitle(self.note_title.get("1.0", "end-1c"))
+    
+    #Save description
+    def submit_description(self, obj):
+      obj.setDescription(self.note_description.get("1.0", "end-1c"))
 
     #Create a popup for user to input their progress
     def set_progress_popup(self,obj):
@@ -328,14 +338,6 @@ class Gui(tk.Frame):
       progress_submit.pack(padx=10, pady=10)
 
       popup.geometry("320x190+{}+{}".format(self.main.winfo_rootx() + (self.main.winfo_width() - 320)//2, self.main.winfo_rooty() + (self.main.winfo_height() - 630)//2))
-    
-    #Save Title
-    def submit_title(self, obj):
-      obj.setTitle(self.note_title.get("1.0", "end-1c"))
-    
-    #Save description
-    def submit_description(self, obj):
-      obj.setDescription(self.note_description.get("1.0", "end-1c"))
 
     #Validate input, save input, and close popup
     def set_progress(self, progress_entry, popup, obj, label):
@@ -441,7 +443,7 @@ class Gui(tk.Frame):
       self.clear(self.main)
       self.create_header()
       self.header_title.config(text="GPA Calculator")
-      #self.create_gpa_calculator
+      cgpa(self.main)
       self.create_navbar()
 
 

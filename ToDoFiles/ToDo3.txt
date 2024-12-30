@@ -1,8 +1,8 @@
 3
 Write functions for navigation  bar
 100
-2024-12-22
-True
-*Need to clear the page
-*Set header title
-*Create new content
+None
+False
+*Write function for navigation bar
+*Change the title on the top corner
+*Clear the page before loading the new widgets

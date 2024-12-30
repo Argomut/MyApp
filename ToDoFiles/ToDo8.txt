@@ -1,9 +1,9 @@
 8
 Integrate other modules
-90
+100
 2024-12-23
-True
+False
 *integrate GPA calculator
 *integrate Pomodoro timer
 *Put their icon in nav bar
-*Put all in one file????
+*Put all in one file???? Not needed

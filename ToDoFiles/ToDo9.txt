@@ -1,0 +1,8 @@
+9
+Complete the app
+100
+None
+False
+*Final testing of the app
+*Final adjustments
+*Upload to github repository

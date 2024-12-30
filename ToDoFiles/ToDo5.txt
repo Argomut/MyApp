@@ -1,6 +1,19 @@
 5
-Presentation
-0
+Presentatin
+20
 2024-12-31
-False
-Create power point for presentation
+True
+*Configure presentation PC
+*Make power point
+*Prepare presentation data (ToDoFiles)
+*Give brief overview with power point
+*Demonstration
+	*Create Task (Final assessment)
+	*Search Feature
+	*Sort Feature
+	*Pin feature
+	*Update Presentation task (typo, progress, deadline)
+	*Show error handling (progress)asd
+	*Delete Task
+*Ask for on the spot coding
+*QnA
