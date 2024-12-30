@@ -1,3 +1,4 @@
+#Pang Qian Fu
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -209,13 +210,13 @@ class cgpa():
             print(record["cgpa"])
             print(record["totalcredit"])
             semlbl = Label(self.framebody,text=f"Semester {idx}",font=("Times New Roman",20,"bold"),anchor="w").grid(row=rownum,column=1,pady=20)
-            hshowgpa = Label(self.framebody,text=f"{record["gpa"]}",font=("Times New Roman",30,"bold")).grid(row=rownum+1,column=1,padx=20)
+            hshowgpa = Label(self.framebody,text=f"{record['gpa']}",font=("Times New Roman",30,"bold")).grid(row=rownum+1,column=1,padx=20)
             hshowgpaw = Label(self.framebody,text=" GPA ",font=("Times New Roman",14,"bold")).grid(row=rownum+2,column=1,padx=20)
-            hshowcdt = Label(self.framebody,text=f"{record["credit"]}",font=("Times New Roman",30,"bold")).grid(row=rownum+3,column=1,padx=20)
+            hshowcdt = Label(self.framebody,text=f"{record['credit']}",font=("Times New Roman",30,"bold")).grid(row=rownum+3,column=1,padx=20)
             hshowcdtw = Label(self.framebody,text=" Credit Hours Earned ",font=("Times New Roman",14,"bold")).grid(row=rownum+4,column=1,padx=20)
-            hshowcgpa = Label(self.framebody,text=f"{record["cgpa"]}",font=("Times New Roman",30,"bold")).grid(row=rownum+1,column=2,padx=20)
+            hshowcgpa = Label(self.framebody,text=f"{record['cgpa']}",font=("Times New Roman",30,"bold")).grid(row=rownum+1,column=2,padx=20)
             hshowcgpaw = Label(self.framebody,text=" CGPA ",font=("Times New Roman",14,"bold")).grid(row=rownum+2,column=2,padx=20)
-            hshowtcdt = Label(self.framebody,text=f"{record["totalcredit"]}",font=("Times New Roman",30,"bold")).grid(row=rownum+3,column=2,padx=20)
+            hshowtcdt = Label(self.framebody,text=f"{record['totalcredit']}",font=("Times New Roman",30,"bold")).grid(row=rownum+3,column=2,padx=20)
             hshowtcdtw = Label(self.framebody,text=" Total Credit Hours Earned ",font=("Times New Roman",14,"bold")).grid(row=rownum+4,column=2,padx=20)
             rownum += 5
 

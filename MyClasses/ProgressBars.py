@@ -1,4 +1,4 @@
-########## Custom Circular Progress Bar) ##########
+########## Custom Circular Progress Bar (Elden) ##########
 
 
 import tkinter as tk
