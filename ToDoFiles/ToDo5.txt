@@ -15,5 +15,5 @@ True
 	*Update Presentation task (typo, progress, deadline)
 	*Show error handling (progress)asd
 	*Delete Task
-*Ask for on the spot coding
+*On-the-spot coding
 *QnA
